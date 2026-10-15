@@ -52,6 +52,17 @@ class TestSingleDownload(unittest.TestCase):
         self.assertEqual(get.call_args.args[0], "https://cdn.example.com/example.jar")
 
     @patch("mcmods_sync.server.requests.get")
+    def test_irrelevant_missing_origin_does_not_block_download(self, get):
+        self.server.modsList.append({"filename": "other.jar",
+                                     "sha1": self.expected,
+                                     "downloadUrl": "https://cdn.example.com/other.jar",
+                                     "serverDownloadUrl": ""})
+        get.return_value = FakeResponse(self.payload)
+        config.prefer_server = True
+        self.server.downloadModFile(self.filename)
+        self.assertEqual(get.call_args.args[0], "https://mc.example.com/example.jar")
+
+    @patch("mcmods_sync.server.requests.get")
     def test_prefer_server_download(self, get):
         get.return_value = FakeResponse(self.payload)
         config.prefer_server = True

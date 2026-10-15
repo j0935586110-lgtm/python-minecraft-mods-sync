@@ -53,15 +53,22 @@ class Server:
         hash_dict = { getFilenameFromServerRawFilename(mod["filename"]): mod["sha1"] for mod in self.modsList }
         return hash_dict
 
-    def getModFileDownloadUrls(self) -> dict:
-        download_dict = {getFilenameFromServerRawFilename(mod["filename"]): select_download_url(mod, prefer_server=config.prefer_server) for mod in self.modsList}
-        return download_dict
+    def getModFileDownloadUrls(self, filenames=None) -> dict:
+        # Do not reject an unrelated, already-installed mod just because its
+        # optional origin URL is absent; validate only actual downloads.
+        selected = set(filenames) if filenames is not None else None
+        return {
+            name: select_download_url(mod, prefer_server=config.prefer_server)
+            for mod in self.modsList
+            if (name := getFilenameFromServerRawFilename(mod["filename"])) and
+               (selected is None or name in selected)
+        }
 
     def downloadModFile(self, filename: str, outputCli: bool = False, progress_callback = None, should_stop=None):
 
         rawFilename = getRawFilename(filename)
         dest_path = Path(config.mods_path) / rawFilename
-        url = self.getModFileDownloadUrls()[filename]
+        url = self.getModFileDownloadUrls([filename])[filename]
         response = requests.get(url, stream=True, timeout=(5, 60))
         response.raise_for_status()
         total_length_str = response.headers.get('Content-Length')

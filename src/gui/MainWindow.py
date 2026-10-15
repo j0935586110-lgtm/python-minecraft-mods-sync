@@ -42,6 +42,8 @@ class MainWindow(QMainWindow):
         self._close_requested = False
         self.ui.preferServer_checkBox.setChecked(bool(config.prefer_server))
         self.ui.preferServer_checkBox.toggled.connect(self.set_prefer_server)
+        self.ui.startSync_pBtn.clicked.connect(self.start_sync)
+        self.ui.startSync_pBtn.setVisible(False)
 
         # 隱藏目前暫無功能的Layout
         # self.ui.extra_widget.setVisible(False)
@@ -105,12 +107,17 @@ class MainWindow(QMainWindow):
                 event.accept()
                 self.exit_code = 1
 
+    def set_manual_start(self, manual: bool):
+        # Launcher invocation retains immediate synchronization by default.
+        # Manual mode provides a chance to choose an origin before starting.
+        self.ui.startSync_pBtn.setVisible(bool(manual))
+
     def set_prefer_server(self, enabled: bool):
-        # Existing GUI starts syncing immediately, so this setting affects
-        # subsequent single-file downloads (not downloads already in flight).
         config.prefer_server = bool(enabled)
 
     def start_sync(self):
+        self.ui.startSync_pBtn.setEnabled(False)
+        self.ui.preferServer_checkBox.setEnabled(False)
         self._sync_succeeded = False
         self.sync_thread = QThread()
         self.worker = SyncWorker()
