@@ -379,6 +379,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </layout>
     </item>
     <item>
+     <widget class="QCheckBox" name="preferServer_checkBox">
+      <property name="toolTip">
+       <string>使用自建伺服器的 serverDownloadUrl；未提供直連網址會回報錯誤，不會偷偷改用 CDN。整包 ZIP 仍由伺服器提供。</string>
+      </property>
+      <property name="text">
+       <string>優先從自建伺服器下載（不使用公開 CDN）</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QGroupBox" name="step_layout">
       <property name="title">
        <string/>

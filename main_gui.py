@@ -54,6 +54,7 @@ def main():
             sys.exit(1)
 
     core.setEnv(mods_dir, args.prefix, args.remote)
+    config.prefer_server = args.prefer_server
 
     win = MainWindow()
     win.show()
